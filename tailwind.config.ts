@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,20 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				sui: {
+					'50': '#eef9ff',
+					'100': '#d8f1ff',
+					'200': '#b8e8ff',
+					'300': '#85daff',
+					'400': '#4bc1ff',
+					'500': '#239eff',
+					'600': '#0a7aff',
+					'700': '#0a67ff',
+					'800': '#1054db',
+					'900': '#1449ad',
+					'950': '#0c2b69',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +98,28 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-slow': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.5' },
+				},
+				'gradient-rotate': {
+					'0%': { 'background-position': '0% 50%' },
+					'50%': { 'background-position': '100% 50%' },
+					'100%': { 'background-position': '0% 50%' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
+				'gradient-rotate': 'gradient-rotate 5s ease infinite',
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'hero-pattern': 'linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url("/hero-bg.jpg")',
+				'sui-gradient': 'linear-gradient(90deg, #0a7aff 0%, #1054db 100%)',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
