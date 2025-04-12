@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, LogOut, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
@@ -25,7 +26,7 @@ export function UserMenu() {
   if (!user) {
     return (
       <Button variant="outline" size="sm" asChild>
-        <a href="/auth">Login</a>
+        <Link to="/auth">Login</Link>
       </Button>
     );
   }

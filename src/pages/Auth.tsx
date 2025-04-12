@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -14,15 +14,22 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { user, signIn, signUp } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       await signIn(email, password);
-      navigate('/');
+      // Navigation happens in the useEffect
     } catch (error) {
       console.error('Error signing in:', error);
     } finally {
@@ -35,7 +42,7 @@ const Auth = () => {
     setLoading(true);
     try {
       await signUp(email, password, { full_name: fullName });
-      navigate('/');
+      // Navigation happens in the useEffect
     } catch (error) {
       console.error('Error signing up:', error);
     } finally {
