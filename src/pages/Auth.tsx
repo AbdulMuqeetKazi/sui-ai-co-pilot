@@ -1,175 +1,167 @@
 
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
-import { Code } from 'lucide-react';
+import { MoveRight, Mail, Lock, UserRound } from 'lucide-react';
 
 const Auth = () => {
-  const { user, loading, signIn, signUp } = useAuth();
-  const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  // If user is already logged in, redirect to home page
-  if (!loading && user) {
-    return <Navigate to="/" replace />;
-  }
+  const [loading, setLoading] = useState(false);
+  const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast({
-        title: "Missing fields",
-        description: "Please enter both email and password",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
+    setLoading(true);
     try {
       await signIn(email, password);
+      navigate('/');
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.error('Error signing in:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast({
-        title: "Missing fields",
-        description: "Please enter both email and password",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
+    setLoading(true);
     try {
       await signUp(email, password, { full_name: fullName });
+      navigate('/');
     } catch (error) {
-      console.error('Sign up error:', error);
+      console.error('Error signing up:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4 md:p-8">
-      <div className="flex items-center mb-8 gap-2">
-        <Code className="h-8 w-8 text-sui-600" />
-        <span className="text-2xl font-bold tracking-tight">
-          SUI<span className="gradient-text">CoPilot</span>
-        </span>
-      </div>
-      
-      <Card className="mx-auto w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-xl">Authentication</CardTitle>
-          <CardDescription>Sign in to your account or create a new one.</CardDescription>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/20 px-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl md:text-3xl">
+            <span className="bg-gradient-to-r from-sui-600 to-sui-800 bg-clip-text text-transparent">
+              SuiCoPilot
+            </span>
+          </CardTitle>
+          <CardDescription>Sign in to your account or create a new one</CardDescription>
         </CardHeader>
-        
         <Tabs defaultValue="signin">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
-          
           <TabsContent value="signin">
             <form onSubmit={handleSignIn}>
               <CardContent className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      className="pl-10"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <a href="#" className="text-sm text-primary hover:underline">
+                      Forgot password?
+                    </a>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      className="pl-10"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In"}
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Signing in...' : 'Sign In'}
+                  {!loading && <MoveRight className="ml-2 h-4 w-4" />}
                 </Button>
               </CardFooter>
             </form>
           </TabsContent>
-          
           <TabsContent value="signup">
             <form onSubmit={handleSignUp}>
               <CardContent className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <div className="relative">
+                    <UserRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="John Doe"
+                      className="pl-10"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="full-name">Full Name (Optional)</Label>
-                  <Input
-                    id="full-name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                  />
+                  <Label htmlFor="email-signup">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email-signup"
+                      type="email"
+                      placeholder="you@example.com"
+                      className="pl-10"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="password-signup">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password-signup"
+                      type="password"
+                      className="pl-10"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Create Account"}
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Creating account...' : 'Create Account'}
+                  {!loading && <MoveRight className="ml-2 h-4 w-4" />}
                 </Button>
               </CardFooter>
             </form>
           </TabsContent>
         </Tabs>
-        
-        <div className="px-6 pb-4 text-center text-sm text-muted-foreground">
-          <Separator className="my-4" />
-          By continuing, you agree to our Terms of Service and Privacy Policy.
-        </div>
       </Card>
     </div>
   );
