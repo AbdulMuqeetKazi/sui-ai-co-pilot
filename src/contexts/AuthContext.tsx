@@ -22,24 +22,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    // First get the initial session
+    const initializeAuth = async () => {
+      try {
+        // Get initial session
+        const { data } = await supabase.auth.getSession();
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Run the initialization
+    initializeAuth();
+
+    // Then set up auth state listener (separated to avoid deadlocks)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        // Use basic state updates in the callback to prevent deadlocks
-        setSession(session);
-        setUser(session?.user ?? null);
-        console.log('Auth state changed:', event, session?.user?.id);
+      (event, newSession) => {
+        console.log('Auth state changed:', event);
+        
+        // Use simple synchronous state updates to prevent deadlocks
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setSession(newSession);
+          setUser(newSession?.user ?? null);
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+        }
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

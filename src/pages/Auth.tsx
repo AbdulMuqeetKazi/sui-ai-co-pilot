@@ -14,22 +14,24 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
-  const { user, signIn, signUp } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+  // Redirect if already logged in (but only after auth has loaded)
   useEffect(() => {
-    if (user) {
-      navigate('/');
+    if (!authLoading && user) {
+      navigate('/', { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
+
+  const { signIn, signUp } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       await signIn(email, password);
-      // Navigation happens in the useEffect
+      // Redirect happens in the useEffect
     } catch (error) {
       console.error('Error signing in:', error);
     } finally {
@@ -42,13 +44,27 @@ const Auth = () => {
     setLoading(true);
     try {
       await signUp(email, password, { full_name: fullName });
-      // Navigation happens in the useEffect
+      // Redirect happens in the useEffect
     } catch (error) {
       console.error('Error signing up:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  // Show a loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // If user is already authenticated, don't render the auth form
+  if (user) {
+    return null; // Redirect will happen in useEffect
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/20 px-4">
