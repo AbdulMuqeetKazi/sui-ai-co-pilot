@@ -5,6 +5,7 @@ import Features from "@/components/Features";
 import AIChatInterface from "@/components/AIChatInterface";
 import ProjectScaffolder from "@/components/ProjectScaffolder";
 import CodeSnippetBrowser from "@/components/CodeSnippetBrowser"; 
+import SuiConceptsExplainer from "@/components/SuiConceptsExplainer";
 import CodeDemo from "@/components/CodeDemo";
 import CallToAction from "@/components/CallToAction";
 import Footer from "@/components/Footer";
@@ -17,6 +18,7 @@ const Index = () => {
         <Hero />
         <Features />
         <CodeSnippetBrowser />
+        <SuiConceptsExplainer />
         <AIChatInterface />
         <ProjectScaffolder />
         <CodeDemo />
