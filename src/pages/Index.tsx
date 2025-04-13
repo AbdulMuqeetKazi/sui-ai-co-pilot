@@ -2,7 +2,8 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
-import DemoChatInterface from "@/components/DemoChatInterface";
+import AIChatInterface from "@/components/AIChatInterface";
+import ProjectScaffolder from "@/components/ProjectScaffolder";
 import CodeDemo from "@/components/CodeDemo";
 import CallToAction from "@/components/CallToAction";
 import Footer from "@/components/Footer";
@@ -14,7 +15,8 @@ const Index = () => {
       <main className="flex-1">
         <Hero />
         <Features />
-        <DemoChatInterface />
+        <AIChatInterface />
+        <ProjectScaffolder />
         <CodeDemo />
         <CallToAction />
       </main>
