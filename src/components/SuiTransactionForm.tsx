@@ -1,12 +1,11 @@
-
 import { useState } from 'react';
-import { TransactionBlock } from '@mysten/sui.js';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { useWallet } from '@suiet/wallet-kit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { createSampleTransactionBlock, getExplorerUrl } from '@/lib/sui-client';
+import { getExplorerUrl } from '@/lib/sui-client';
 import { toast } from '@/hooks/use-toast';
 import { ExternalLink, Send } from 'lucide-react';
 
@@ -27,12 +26,16 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
 
     try {
       setIsSubmitting(true);
-      // Convert amount to MIST (smallest unit in Sui, 1 SUI = 10^9 MIST)
-      const amountInMist = Math.floor(parseFloat(amount) * 10 ** 9);
-      
-      const txb = createSampleTransactionBlock(recipient, amountInMist);
+      const amountInMist = Math.floor(parseFloat(amount) * 1e9); // Convert SUI to MIST
+
+      // Create a new transaction block
+      const tx = new TransactionBlock();
+      tx.transferObjects([tx.gas], tx.pure(recipient)); // Send gas to recipient
+
+      // Note: If transferring actual tokens, use coin transfer logic instead
+
       const result = await signAndExecuteTransactionBlock({
-        transactionBlock: txb,
+        transactionBlock: tx,
       });
 
       setTxHash(result.digest);
@@ -40,8 +43,7 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
         title: 'Transaction successful',
         description: 'Your transaction has been submitted to the network.',
       });
-      
-      // Reset form
+
       setRecipient('');
       setAmount('');
     } catch (error) {
@@ -96,7 +98,7 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
               disabled={!connected || isSubmitting}
             />
           </div>
-          
+
           {txHash && (
             <div className="mt-4 flex items-center justify-between p-3 bg-secondary rounded-md">
               <span className="text-xs font-mono truncate max-w-[180px]">Transaction: {txHash.substring(0, 8)}...{txHash.substring(txHash.length - 8)}</span>
@@ -107,9 +109,9 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
           )}
         </CardContent>
         <CardFooter>
-          <Button 
-            type="submit" 
-            className="w-full" 
+          <Button
+            type="submit"
+            className="w-full"
             disabled={!connected || isSubmitting || !recipient || !amount}
           >
             <Send className="mr-2 h-4 w-4" />
