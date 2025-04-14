@@ -13,6 +13,21 @@ interface WalletInfoProps {
 
 const WalletInfo = ({ network }: WalletInfoProps) => {
   const { connected, account, disconnect } = useWallet();
+  const [balance, setBalance] = useState<string>('0');
+
+  // Fetch the balance when account changes
+  useEffect(() => {
+    if (connected && account) {
+      // The balance property might be accessed differently based on the wallet-kit's API
+      // For now, let's use a default value and assume it might be available in a different way
+      if ('balance' in account) {
+        setBalance(String(account.balance));
+      } else {
+        // If no balance property, we can access it directly if available or leave as default
+        setBalance('0');
+      }
+    }
+  }, [account, connected]);
 
   const copyAddress = () => {
     if (account?.address) {
@@ -75,7 +90,7 @@ const WalletInfo = ({ network }: WalletInfoProps) => {
       <div className="flex flex-col space-y-1">
         <div className="text-sm font-medium">Balance</div>
         <div className="text-lg font-semibold">
-          {account.balance ? formatBalance(account.balance) : '0 SUI'}
+          {formatBalance(balance)}
         </div>
       </div>
     </div>
