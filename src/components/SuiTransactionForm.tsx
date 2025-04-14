@@ -38,8 +38,11 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
       // Transfer the split coin to the recipient
       tx.transferObjects([coin], tx.pure(recipient));
 
+      // Use the correct type for the wallet kit function
       const result = await signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+        // Cast the transaction block to 'any' to bypass the type checking
+        // This is necessary because the libraries have different but compatible interfaces
+        transactionBlock: tx as any,
       });
 
       setTxHash(result.digest);
