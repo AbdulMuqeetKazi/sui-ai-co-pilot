@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { useWallet } from '@suiet/wallet-kit';
@@ -30,9 +31,12 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
 
       // Create a new transaction block
       const tx = new TransactionBlock();
-      tx.transferObjects([tx.gas], tx.pure(recipient)); // Send gas to recipient
-
-      // Note: If transferring actual tokens, use coin transfer logic instead
+      
+      // Split the gas coin to get the exact amount we want to send
+      const [coin] = tx.splitCoins(tx.gas, [tx.pure(amountInMist)]);
+      
+      // Transfer the split coin to the recipient
+      tx.transferObjects([coin], tx.pure(recipient));
 
       const result = await signAndExecuteTransactionBlock({
         transactionBlock: tx,
