@@ -31,7 +31,7 @@ const SuiWalletPanel = () => {
               </CardHeader>
               <CardContent>
                 <SuiNetworkSelector 
-                  selectedNetwork={selectedNetwork} 
+                  network={selectedNetwork} 
                   onNetworkChange={handleNetworkChange} 
                 />
               </CardContent>

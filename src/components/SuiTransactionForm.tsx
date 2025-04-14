@@ -98,7 +98,7 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
           
           {txHash && (
             <div className="mt-4 flex items-center justify-between p-3 bg-secondary rounded-md">
-              <span className="text-xs font-mono truncate">Transaction: {txHash.substring(0, 8)}...{txHash.substring(txHash.length - 8)}</span>
+              <span className="text-xs font-mono truncate max-w-[180px]">Transaction: {txHash.substring(0, 8)}...{txHash.substring(txHash.length - 8)}</span>
               <Button variant="ghost" size="sm" onClick={viewTransaction}>
                 <ExternalLink className="h-4 w-4" />
               </Button>

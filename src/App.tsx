@@ -12,7 +12,6 @@ import NotFound from "./pages/NotFound";
 import CodeSnippetGenerator from "./pages/CodeSnippetGenerator";
 import ConceptExplorer from "./pages/ConceptExplorer";
 import SuiWalletPanel from "./pages/SuiWalletPanel";
-import { WalletProvider } from '@suiet/wallet-kit';
 import '@suiet/wallet-kit/style.css';
 
 const queryClient = new QueryClient();
@@ -23,20 +22,18 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <WalletProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/code-snippets" element={<CodeSnippetGenerator />} />
-              <Route path="/concepts" element={<ConceptExplorer />} />
-              <Route path="/wallet" element={<SuiWalletPanel />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </WalletProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/code-snippets" element={<CodeSnippetGenerator />} />
+            <Route path="/concepts" element={<ConceptExplorer />} />
+            <Route path="/wallet" element={<SuiWalletPanel />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
