@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { TransactionBlock } from '@mysten/sui.js';
 import { useWallet } from '@suiet/wallet-kit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
