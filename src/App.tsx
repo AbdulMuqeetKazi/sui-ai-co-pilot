@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import CodeSnippetGenerator from "./pages/CodeSnippetGenerator";
 import ConceptExplorer from "./pages/ConceptExplorer";
 import SuiWalletPanel from "./pages/SuiWalletPanel";
+import CodeAndConcepts from "./pages/CodeAndConcepts";
 import '@suiet/wallet-kit/style.css';
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/code-snippets" element={<CodeSnippetGenerator />} />
             <Route path="/concepts" element={<ConceptExplorer />} />
             <Route path="/wallet" element={<SuiWalletPanel />} />
+            <Route path="/code-and-concepts" element={<CodeAndConcepts />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

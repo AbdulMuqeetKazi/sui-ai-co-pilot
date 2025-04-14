@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      code_snippets: {
+        Row: {
+          code: string | null
+          created_at: string | null
+          id: string
+          title: string | null
+          user_id: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string | null
+          id?: string
+          title?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string | null
+          id?: string
+          title?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -30,6 +54,84 @@ export type Database = {
           id?: string
           updated_at?: string | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      prompt_history: {
+        Row: {
+          created_at: string | null
+          id: string
+          prompt: string | null
+          response: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          prompt?: string | null
+          response?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          prompt?: string | null
+          response?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      sui_transactions: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          id: string
+          recipient: string | null
+          status: string | null
+          tx_hash: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          id?: string
+          recipient?: string | null
+          status?: string | null
+          tx_hash?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          id?: string
+          recipient?: string | null
+          status?: string | null
+          tx_hash?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      tx_logs: {
+        Row: {
+          created_at: string
+          id: string
+          summary: string
+          tx_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          summary: string
+          tx_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          summary?: string
+          tx_hash?: string
+          user_id?: string
         }
         Relationships: []
       }

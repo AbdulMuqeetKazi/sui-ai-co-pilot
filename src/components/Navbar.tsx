@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { UserMenu } from '@/components/UserMenu';
-import { Code, BookOpen, Wallet, Home } from 'lucide-react';
+import { Code, BookOpen, Wallet, Home, FileCode } from 'lucide-react';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -31,6 +31,15 @@ const Navbar = () => {
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     <Code className="w-4 h-4 mr-2" />
                     Code Snippets
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <Link to="/code-and-concepts">
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    <FileCode className="w-4 h-4 mr-2" />
+                    Code & Concepts
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
@@ -66,6 +75,11 @@ const Navbar = () => {
           <Link to="/code-snippets">
             <Button variant="ghost" size="sm">
               <Code className="w-4 h-4" />
+            </Button>
+          </Link>
+          <Link to="/code-and-concepts">
+            <Button variant="ghost" size="sm">
+              <FileCode className="w-4 h-4" />
             </Button>
           </Link>
           <Link to="/concepts">

@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { getExplorerUrl } from '@/lib/sui-client';
 import { toast } from '@/hooks/use-toast';
 import { ExternalLink, Send } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SuiTransactionFormProps {
   network: string;
@@ -20,6 +22,7 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +49,18 @@ const SuiTransactionForm = ({ network }: SuiTransactionFormProps) => {
       });
 
       setTxHash(result.digest);
+      
+      // Save transaction log to Supabase if user is logged in
+      if (user) {
+        const summary = `Sent ${amount} SUI to ${recipient.substring(0, 8)}...${recipient.substring(recipient.length - 6)}`;
+        
+        await supabase.from('tx_logs').insert({
+          user_id: user.id,
+          tx_hash: result.digest,
+          summary: summary
+        });
+      }
+      
       toast({
         title: 'Transaction successful',
         description: 'Your transaction has been submitted to the network.',
