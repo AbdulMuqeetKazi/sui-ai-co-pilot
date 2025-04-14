@@ -1,110 +1,160 @@
 
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { generateAiResponse } from '@/services/aiService';
+import React, { useState, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { Message } from '@/components/chat/types';
-import ChatHeader from '@/components/chat/ChatHeader';
-import ChatMessages from '@/components/chat/ChatMessages';
-import ChatInput from '@/components/chat/ChatInput';
+import { Code, Copy } from 'lucide-react';
 
-const AIChatInterface = () => {
+type Message = {
+  id: number;
+  role: 'user' | 'assistant';
+  content: string;
+  codeSnippets?: string[];
+};
+
+const AIChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
-  const handleSendMessage = async () => {
-    if (!input.trim()) return;
+  const extractCodeSnippets = (text: string): string[] => {
+    const codeRegex = /```[\w]*\n([\s\S]*?)```/g;
+    const snippets: string[] = [];
+    let match;
     
-    // Add user message
-    const userMessage: Message = {
+    while ((match = codeRegex.exec(text)) !== null) {
+      snippets.push(match[1].trim());
+    }
+    
+    return snippets;
+  };
+
+  const handleSendMessage = useCallback(async () => {
+    if (!input.trim() || !user) return;
+
+    const newUserMessage: Message = {
       id: Date.now(),
-      role: 'user', 
-      content: input,
+      role: 'user',
+      content: input
     };
-    
-    setMessages(prev => [...prev, userMessage]);
+
+    setMessages(prev => [...prev, newUserMessage]);
     setInput('');
     setIsLoading(true);
-    
+
     try {
-      // Call the AI service
-      const response = await generateAiResponse(input);
-      
-      // Add AI response
-      const aiMessage: Message = {
+      const { data, error } = await supabase.functions.invoke('askAI', {
+        body: JSON.stringify({ 
+          prompt: input,
+          context: {
+            userId: user.id,
+            walletAddress: user.email // Replace with actual wallet address when available
+          }
+        })
+      });
+
+      if (error) throw error;
+
+      const assistantMessage: Message = {
         id: Date.now() + 1,
         role: 'assistant',
-        content: response.content,
-        codeSnippets: response.codeSnippets,
-        references: response.references
+        content: data.response,
+        codeSnippets: extractCodeSnippets(data.response)
       };
-      
-      setMessages(prev => [...prev, aiMessage]);
+
+      setMessages(prev => [...prev, assistantMessage]);
+
+      // Log prompt history
+      await supabase
+        .from('prompt_history')
+        .insert({
+          user_id: user.id,
+          prompt: input,
+          response: data.response,
+          type: 'ai_chat',
+          tokens_used: data.tokens || 0
+        });
+
     } catch (error) {
-      console.error('Error generating AI response:', error);
       toast({
-        title: "Error",
-        description: "Failed to generate AI response. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to send message',
+        variant: 'destructive'
       });
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, user]);
 
-  const handleClearChat = () => {
-    setMessages([]);
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
     toast({
-      title: "Chat cleared",
-      description: "All messages have been cleared.",
+      title: 'Copied',
+      description: 'Code snippet copied to clipboard'
     });
-  };
-  
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
   };
 
   return (
-    <section id="chat" className="py-20 px-4 bg-secondary/50">
-      <div className="container max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            <span className="gradient-text">Ask SuiCoPilot</span>
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get real-time help with your Sui blockchain development questions.
-          </p>
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Code /> Sui AI Assistant
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <div 
+              key={message.id} 
+              className={`p-3 rounded-lg ${
+                message.role === 'user' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-secondary'
+              }`}
+            >
+              {message.content}
+              {message.codeSnippets && message.codeSnippets.map((snippet, index) => (
+                <div 
+                  key={index} 
+                  className="mt-2 bg-background border rounded-md p-2 relative"
+                >
+                  <pre className="text-sm overflow-x-auto">{snippet}</pre>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute top-1 right-1"
+                    onClick={() => handleCopyCode(snippet)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
         
-        <Card className="max-w-4xl mx-auto border shadow-lg">
-          <CardContent className="p-0 flex flex-col h-[550px]">
-            <ChatHeader onClearChat={handleClearChat} />
-            
-            <ChatMessages 
-              messages={messages} 
-              isLoading={isLoading} 
-            />
-            
-            <Separator />
-            
-            <div className="p-4">
-              <ChatInput
-                input={input}
-                isLoading={isLoading}
-                onInputChange={setInput}
-                onSendMessage={handleSendMessage}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </section>
+        <div className="mt-4 flex space-x-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about Sui development..."
+            disabled={isLoading || !user}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+          />
+          <Button 
+            onClick={handleSendMessage} 
+            disabled={isLoading || !input.trim() || !user}
+          >
+            Send
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -111,6 +111,36 @@ export type Database = {
         }
         Relationships: []
       }
+      transaction_logs: {
+        Row: {
+          created_at: string
+          details: Json | null
+          gas_used: number | null
+          id: string
+          status: string
+          tx_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          gas_used?: number | null
+          id?: string
+          status: string
+          tx_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          gas_used?: number | null
+          id?: string
+          status?: string
+          tx_hash?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tx_logs: {
         Row: {
           created_at: string
@@ -132,6 +162,30 @@ export type Database = {
           summary?: string
           tx_hash?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          preferences: Json | null
+          updated_at: string
+          wallet_address: string | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          preferences?: Json | null
+          updated_at?: string
+          wallet_address?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          preferences?: Json | null
+          updated_at?: string
+          wallet_address?: string | null
         }
         Relationships: []
       }
