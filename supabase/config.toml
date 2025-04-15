@@ -3,3 +3,6 @@ project_id = "verxelysubqjqdosyref"
 
 [functions.askAI]
 verify_jwt = true
+
+[functions.getWalletInfo]
+verify_jwt = true
