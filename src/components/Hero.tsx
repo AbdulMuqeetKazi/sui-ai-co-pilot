@@ -1,9 +1,8 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, BookOpen, Wallet, Bot } from 'lucide-react';
-import { typewriter } from '@/lib/typewriter';
+import { typeWriter } from '@/lib/typewriter';
 
 const Hero = () => {
   const [isTyping, setIsTyping] = useState(true);
@@ -11,7 +10,7 @@ const Hero = () => {
   
   useEffect(() => {
     if (typingRef.current) {
-      const stopTyping = typewriter(
+      const stopTyping = typeWriter(
         typingRef.current,
         ["Build on Sui with AI-powered assistance", "Generate Move code with natural language", "Understand Sui concepts and best practices", "Simulate transactions and test your code"],
         {
