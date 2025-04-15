@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWallet } from '@suiet/wallet-kit';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,16 +26,16 @@ interface SimulationResult {
 }
 
 const TransactionSimulator = ({ network }: { network: string }) => {
-  const { account, connected, signAndExecuteTransactionBlock } = useWallet();
+  const wallet = useWallet();
   const { user } = useAuth();
   const [recipient, setRecipient] = useState('');
-  const [amount, setAmount] = useState('1000000'); // In MIST (1 SUI = 1,000,000,000 MIST)
+  const [amount, setAmount] = useState('1000000'); 
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   
   const handleSimulate = async () => {
-    if (!account?.address || !connected || !recipient || !amount) {
+    if (!wallet.account?.address || !wallet.connected || !recipient || !amount) {
       toast({
         title: "Simulation failed",
         description: "Please connect your wallet and enter recipient address and amount",
@@ -61,7 +60,7 @@ const TransactionSimulator = ({ network }: { network: string }) => {
       const { data, error } = await supabase.functions.invoke('runTransactionSim', {
         body: JSON.stringify({
           txb: serializedTxb,
-          sender: account.address,
+          sender: wallet.account.address,
           network
         })
       });
@@ -112,7 +111,7 @@ const TransactionSimulator = ({ network }: { network: string }) => {
   };
   
   const executeTransaction = async () => {
-    if (!account?.address || !connected || !recipient || !amount) {
+    if (!wallet.account?.address || !wallet.connected || !recipient || !amount) {
       toast({
         title: "Transaction failed",
         description: "Please connect your wallet and enter recipient address and amount",
@@ -132,8 +131,8 @@ const TransactionSimulator = ({ network }: { network: string }) => {
       const [coin] = txb.splitCoins(txb.gas, [txb.pure(parseInt(amount))]);
       txb.transferObjects([coin], txb.pure(recipient));
       
-      // Execute the transaction with the correct type structure
-      const result = await signAndExecuteTransactionBlock({
+      // Execute the transaction using wallet's method directly
+      const result = await wallet.signAndExecuteTransactionBlock({
         transactionBlock: txb,
       });
       
@@ -238,7 +237,7 @@ console.log('Transaction digest:', result.digest);`;
         
         <Button
           onClick={handleSimulate}
-          disabled={isSimulating || !connected || !recipient || !amount}
+          disabled={isSimulating || !wallet.connected || !recipient || !amount}
           className="w-full"
         >
           {isSimulating ? (
@@ -302,7 +301,7 @@ console.log('Transaction digest:', result.digest);`;
                 <Button
                   onClick={executeTransaction}
                   className="w-full"
-                  disabled={!connected}
+                  disabled={!wallet.connected}
                 >
                   Execute Real Transaction
                 </Button>
