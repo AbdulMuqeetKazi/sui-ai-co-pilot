@@ -6,3 +6,6 @@ verify_jwt = true
 
 [functions.getWalletInfo]
 verify_jwt = true
+
+[functions.runTransactionSim]
+verify_jwt = true

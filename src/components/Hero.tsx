@@ -1,51 +1,104 @@
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Code, BookOpen, Wallet, Bot } from 'lucide-react';
+import { typewriter } from '@/lib/typewriter';
 
 const Hero = () => {
-  const [text, setText] = useState('');
-  const fullText = "Build smarter, faster Sui blockchain apps with AI assistance";
+  const [isTyping, setIsTyping] = useState(true);
+  const typingRef = useRef<HTMLHeadingElement>(null);
   
   useEffect(() => {
-    let index = 0;
-    const interval = setInterval(() => {
-      setText(fullText.substring(0, index));
-      index++;
-      if (index > fullText.length) {
-        clearInterval(interval);
-      }
-    }, 50);
-    
-    return () => clearInterval(interval);
+    if (typingRef.current) {
+      const stopTyping = typewriter(
+        typingRef.current,
+        ["Build on Sui with AI-powered assistance", "Generate Move code with natural language", "Understand Sui concepts and best practices", "Simulate transactions and test your code"],
+        {
+          startDelay: 500,
+          typeSpeed: 50,
+          backSpeed: 30,
+          backDelay: 2000,
+          loop: true,
+          onComplete: () => setIsTyping(false),
+        }
+      );
+      
+      return () => {
+        stopTyping();
+      };
+    }
   }, []);
 
   return (
-    <section className="relative py-20 md:py-32 px-4 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-sui-900/20 via-background to-accent/10 -z-10" />
-      <div className="container max-w-5xl mx-auto">
-        <div className="flex flex-col gap-8 text-center items-center">
-          <div className="inline-block bg-sui-100 px-4 py-1.5 rounded-full text-sui-800 text-sm font-medium">
-            Sui Overflow 2025 Hackathon
+    <section className="py-24 px-4 bg-primary/5 dark:bg-primary/10">
+      <div className="container max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 items-center">
+          <div className="space-y-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
+              <span className="gradient-text">SuiCoPilot</span>
+            </h1>
+            
+            <div className="h-24">
+              <h2 
+                ref={typingRef} 
+                className="text-2xl md:text-3xl font-medium"
+              >
+                Build on Sui with AI-powered assistance
+              </h2>
+            </div>
+            
+            <p className="text-xl text-muted-foreground max-w-lg">
+              Accelerate your development with AI-powered tools and resources specifically designed for Sui blockchain developers.
+            </p>
+            
+            <div className="flex flex-wrap gap-4">
+              <Button asChild size="lg">
+                <Link to="/sui-development">
+                  Get Started
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="outline" size="lg" asChild>
+                <a href="https://docs.sui.io" target="_blank" rel="noopener noreferrer">
+                  Sui Documentation
+                </a>
+              </Button>
+            </div>
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-            <span className="blinking-cursor">{text}</span>
-          </h1>
-          
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            The first AI-powered co-pilot built specifically for Sui blockchain developers.
-            Get smart suggestions, instant code snippets, and seamless integration with your projects.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 mt-4">
-            <Button size="lg" className="gap-2">
-              <span>Get Started</span>
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline">
-              Learn More
-            </Button>
+          <div className="grid grid-cols-2 gap-4">
+            <Link to="/sui-development?tab=chat" className="group">
+              <div className="bg-card border rounded-lg p-6 transition-all hover:shadow-md hover:-translate-y-1">
+                <Bot className="h-10 w-10 mb-4 text-primary" />
+                <h3 className="text-xl font-medium mb-2">AI Assistant</h3>
+                <p className="text-muted-foreground">Chat with an AI assistant specialized in Sui blockchain</p>
+              </div>
+            </Link>
+            
+            <Link to="/sui-development?tab=code" className="group">
+              <div className="bg-card border rounded-lg p-6 transition-all hover:shadow-md hover:-translate-y-1">
+                <Code className="h-10 w-10 mb-4 text-primary" />
+                <h3 className="text-xl font-medium mb-2">Code Generation</h3>
+                <p className="text-muted-foreground">Generate Move code from natural language descriptions</p>
+              </div>
+            </Link>
+            
+            <Link to="/sui-development?tab=concepts" className="group">
+              <div className="bg-card border rounded-lg p-6 transition-all hover:shadow-md hover:-translate-y-1">
+                <BookOpen className="h-10 w-10 mb-4 text-primary" />
+                <h3 className="text-xl font-medium mb-2">Concept Explorer</h3>
+                <p className="text-muted-foreground">Learn about Sui concepts and best practices</p>
+              </div>
+            </Link>
+            
+            <Link to="/sui-development?tab=transactions" className="group">
+              <div className="bg-card border rounded-lg p-6 transition-all hover:shadow-md hover:-translate-y-1">
+                <Wallet className="h-10 w-10 mb-4 text-primary" />
+                <h3 className="text-xl font-medium mb-2">Transaction Simulator</h3>
+                <p className="text-muted-foreground">Test transactions without spending gas</p>
+              </div>
+            </Link>
           </div>
         </div>
       </div>

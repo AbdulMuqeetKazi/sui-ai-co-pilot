@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { walletAddress, network = 'testnet' } = await req.json()
+    const { walletAddress, network = 'testnet', includeTransactions = true } = await req.json()
     
     if (!walletAddress) {
       throw new Error('Wallet address is required')
@@ -36,21 +36,47 @@ serve(async (req) => {
       limit: 50,
     })
 
-    // Get recent transactions
-    const transactions = await client.queryTransactionBlocks({
-      filter: {
-        FromAddress: walletAddress
-      },
-      limit: 10,
-    })
+    // Structure the response
+    const response: Record<string, any> = {
+      balance,
+      objects: objects.data,
+      network
+    }
+
+    // Get recent transactions if requested
+    if (includeTransactions) {
+      const transactions = await client.queryTransactionBlocks({
+        filter: {
+          FromAddress: walletAddress
+        },
+        limit: 10,
+      })
+      response.transactions = transactions.data
+    }
+
+    // Get coin metadata for better display
+    try {
+      if (balance.coinObjects && balance.coinObjects.length > 0) {
+        const coinTypes = [...new Set(balance.coinObjects.map(coin => coin.coinType))]
+        response.coinMetadata = {}
+        
+        for (const coinType of coinTypes) {
+          try {
+            const metadata = await client.getCoinMetadata({ coinType })
+            if (metadata) {
+              response.coinMetadata[coinType] = metadata
+            }
+          } catch (error) {
+            console.error(`Error fetching metadata for ${coinType}:`, error)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching coin metadata:', error)
+    }
 
     return new Response(
-      JSON.stringify({
-        balance,
-        objects: objects.data,
-        transactions: transactions.data,
-        network
-      }),
+      JSON.stringify(response),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
