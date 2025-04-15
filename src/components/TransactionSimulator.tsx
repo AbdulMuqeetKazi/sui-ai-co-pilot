@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useWallet } from '@suiet/wallet-kit';
 import { supabase } from '@/integrations/supabase/client';
@@ -131,7 +132,7 @@ const TransactionSimulator = ({ network }: { network: string }) => {
       const [coin] = txb.splitCoins(txb.gas, [txb.pure(parseInt(amount))]);
       txb.transferObjects([coin], txb.pure(recipient));
       
-      // Execute the transaction - fix the type by passing the correct object structure
+      // Execute the transaction with the correct type structure
       const result = await signAndExecuteTransactionBlock({
         transactionBlock: txb,
       });
