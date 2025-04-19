@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { useWallet } from '@suiet/wallet-kit';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,18 +25,14 @@ export const useSimulation = (network: string) => {
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
   
-  // Store the TransactionBlock in a ref to reuse between simulation and execution
   const transactionBlockRef = useRef<TransactionBlock | null>(null);
   
   const createTransactionBlock = () => {
-    // Create a transaction block
     const txb = new TransactionBlock();
     const [coin] = txb.splitCoins(txb.gas, [txb.pure(parseInt(amount))]);
     txb.transferObjects([coin], txb.pure(recipient));
     
-    // Store the txb in the ref for reuse
     transactionBlockRef.current = txb;
-    
     return txb;
   };
   
@@ -55,13 +50,10 @@ export const useSimulation = (network: string) => {
       setIsSimulating(true);
       setSimulationResult(null);
       
-      // Create a transaction block and store in ref
       const txb = createTransactionBlock();
       
-      // Serialize the transaction block for the simulation
       const serializedTxb = await txb.serialize();
       
-      // Call the simulation endpoint with the serialized txb
       const { data, error } = await supabase.functions.invoke('runTransactionSim', {
         body: JSON.stringify({
           txb: serializedTxb,
@@ -80,8 +72,7 @@ export const useSimulation = (network: string) => {
         effects: data.effects,
         error: data.result?.errors?.join(', ')
       });
-      
-      // Log simulation in the database
+
       if (user) {
         await supabase.from('transaction_logs').insert({
           user_id: user.id,
@@ -131,14 +122,11 @@ export const useSimulation = (network: string) => {
         description: "Please confirm the transaction in your wallet"
       });
       
-      // Use the existing transaction block from the ref or create a new one
       const txb = transactionBlockRef.current || createTransactionBlock();
       
-      // Pass the TransactionBlock instance directly to signAndExecuteTransactionBlock
-      // Cast to 'any' to bypass type checking since wallet-kit has its own Transaction type
       const result = await wallet.signAndExecuteTransactionBlock({
-        transactionBlock: txb as any,
-      });
+        transactionBlock: txb,
+      } as any);
       
       console.log('Transaction result:', result);
       
@@ -147,7 +135,6 @@ export const useSimulation = (network: string) => {
         description: `Transaction digest: ${result.digest.slice(0, 10)}...`
       });
       
-      // Log transaction in the database
       if (user) {
         await supabase.from('transaction_logs').insert({
           user_id: user.id,
