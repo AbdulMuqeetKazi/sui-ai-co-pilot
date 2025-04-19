@@ -123,9 +123,9 @@ export const useSimulation = (network: string) => {
       const [coin] = txb.splitCoins(txb.gas, [txb.pure(parseInt(amount))]);
       txb.transferObjects([coin], txb.pure(recipient));
       
-      // Serialize the transaction block before passing to signAndExecuteTransactionBlock
+      // Execute the transaction with the serialized transaction block
       const result = await wallet.signAndExecuteTransactionBlock({
-        transactionBlock: txb.serialize(),
+        transactionBlock: txb,
       });
       
       console.log('Transaction result:', result);
