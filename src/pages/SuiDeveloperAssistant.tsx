@@ -4,8 +4,8 @@ import { WalletProvider } from '@suiet/wallet-kit';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import SuiWalletConnect from '@/components/SuiWalletConnect';
-import SuiAIChat from '@/components/SuiAIChat';
-import CodeSnippetGenerator from '@/components/CodeSnippetGenerator';
+import ImprovedSuiAIChat from '@/components/ImprovedSuiAIChat';
+import ImprovedCodeGenerator from '@/components/ImprovedCodeGenerator';
 import ConceptExplainer from '@/components/ConceptExplainer';
 import Navbar from '@/components/Navbar';
 import { NETWORKS } from '@/lib/sui-client';
@@ -60,12 +60,12 @@ const SuiDeveloperAssistant = () => {
           
           <TabsContent value="chat" className="mt-0">
             <WalletProvider>
-              <SuiAIChat />
+              <ImprovedSuiAIChat />
             </WalletProvider>
           </TabsContent>
           
           <TabsContent value="code" className="mt-0">
-            <CodeSnippetGenerator />
+            <ImprovedCodeGenerator />
           </TabsContent>
           
           <TabsContent value="concepts" className="mt-0">

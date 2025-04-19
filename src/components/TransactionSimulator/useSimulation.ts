@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { useWallet } from '@suiet/wallet-kit';
 import { supabase } from '@/integrations/supabase/client';
@@ -124,6 +125,8 @@ export const useSimulation = (network: string) => {
       
       const txb = transactionBlockRef.current || createTransactionBlock();
       
+      // Use the TransactionBlock directly, but cast to 'any' to bypass the type checking
+      // since @suiet/wallet-kit has its own Transaction type
       const result = await wallet.signAndExecuteTransactionBlock({
         transactionBlock: txb,
       } as any);
